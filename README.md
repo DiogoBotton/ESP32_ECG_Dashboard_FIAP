@@ -8,7 +8,7 @@
 
 # Nome do projeto
 
-Sistema para prever rendimentos baseado em culturas e variáveis climáticas.
+Sistema para monitoramento de temperatura, umidade e batimentos cardíacos.
 
 ## 👨‍🎓 Integrantes:
 
