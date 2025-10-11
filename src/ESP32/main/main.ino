@@ -1,6 +1,10 @@
+#include <time.h>
 #include <DHT.h>
 #include <PubSubClient.h>
 #include <WiFi.h>
+#include "FS.h"
+#include "SPIFFS.h"
+#include <ArduinoJson.h>
 #include "secrets.h"
 
 // Definição das constantes
@@ -22,14 +26,54 @@ DHT dht(DHTPIN, DHTTYPE);
 WiFiClient espClient;
 PubSubClient client(espClient);
 
+// Funções com paramêtros precisam ser declaradas antes de serem utilizadas
+bool MountSPIFFS(int maxRetries = 5) {
+  int attempts = 0;
+  while (!SPIFFS.begin(true)) {
+    Serial.println("Falha ao montar SPIFFS, tentando novamente...");
+    attempts++;
+    delay(500);
+    if (attempts >= maxRetries) {
+      Serial.println("Não foi possível montar o SPIFFS após várias tentativas.");
+      return false;
+    }
+  }
+
+  Serial.println("SPIFFS montado com sucesso!");
+  return true;
+}
+
 void setup() {
   Serial.begin(115200);
 
-  // Conecta ao Wifi e RabbitMQ
-  Reconnect();
-  
+  // Aguarda SPIFFS ser montado
+  if (!MountSPIFFS()) {
+    Serial.println("Erro crítico ao montar SPIFFS. Reiniciando...");
+    delay(3000);
+    ESP.restart();
+  }
+
   dht.begin();
   delay(2000);
+
+  // Conecta ao Wifi e RabbitMQ
+  Reconnect();
+
+  // Sincroniza o fuso horário (NTP - Network Time Protocol)
+  SyncTime();
+}
+
+void SyncTime(){
+  configTime(-3 * 3600, 0, "pool.ntp.org", "time.google.com");
+  Serial.println("Sincronizando com NTP...");
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)) {
+    Serial.println("Falha ao sincronizar com NTP. Usando millis() como fallback.");
+  } else {
+    char timeStr[20];
+    strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", &timeinfo);
+    Serial.println("Data/Hora sincronizada: " + String(timeStr));
+  }
 }
 
 void Reconnect(){
@@ -38,20 +82,26 @@ void Reconnect(){
 }
 
 void ConnectWifi(){
+  int errorCount = 0;
+
   WiFi.begin(wifi_ssid, wifi_pwd);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+  while (WiFi.status() != WL_CONNECTED && errorCount < 3) {
+    errorCount++;
+    delay(1000);
     Serial.print(".");
   }
   Serial.println("Conectado ao Wifi.");
 }
 
 void ConnectRabbitMQ(){
+  int errorCount = 0;
+
   client.setServer(mqtt_ip, mqtt_port);
 
   String client_id = "esp32-client-" + String(WiFi.macAddress());
+
   // Conectar ao RabbitMQ
-  while (!client.connected()) {
+  while (!client.connected() && errorCount < 2) {
     Serial.println("Conectando ao RabbitMQ...");
 
     if (client.connect(client_id.c_str(), mqtt_user, mqtt_pwd)) {
@@ -61,18 +111,123 @@ void ConnectRabbitMQ(){
     } else {
       Serial.print("Falha na conexão, código: ");
       Serial.println(client.state());
-      delay(5000);
+      errorCount++;
+      delay(1000);
     }
   }
 }
 
-void loop() {
-  // Caso perder a conexão com o RabbitMQ, tenta se reconectar novamente ao Wifi e Rabbit
-  if (!client.connected()) {
-    Reconnect();
+// Função para salvar os dados no SPIFFS
+void SaveToSPIFFS(const char* data) {
+  // Limite de armazenamento
+  size_t totalBytes = SPIFFS.totalBytes();
+  size_t usedBytes = SPIFFS.usedBytes();
+  size_t freeBytes = totalBytes - usedBytes;
+
+  if (freeBytes < 2000) { // ~2KB livres
+    Serial.println("Memória quase cheia, não salvando mais dados.");
+    return;
   }
 
-  client.loop();
+  String filename = "/data_" + String(millis()) + ".json";
+  File file = SPIFFS.open(filename, FILE_WRITE);
+  if (!file) {
+    Serial.println("Erro ao abrir arquivo para escrita.");
+    return;
+  }
+
+  file.println(data);
+  file.close();
+  Serial.println("Dados salvos no SPIFFS: " + filename);
+  LogFreeBytes();
+}
+
+void LogFreeBytes(){
+  Serial.printf("Espaço usado: %d / %d bytes\n", SPIFFS.usedBytes(), SPIFFS.totalBytes());
+}
+
+// Função para enviar os dados armazenados no SPIFFS
+void SendSavedData() {
+  if (!CheckConnection()) {
+    Serial.println("Sem internet ou MQTT desconectado. Aguardando para reenviar...");
+    return;
+  }
+
+  File root = SPIFFS.open("/");
+  if (!root) {
+    Serial.println("Erro ao abrir diretório raiz.");
+    return;
+  }
+
+  // Coleta nomes dos arquivos em um vetor
+  std::vector<String> files;
+  File file = root.openNextFile();
+
+  while (file) {
+    String filename = file.name();
+    if (!filename.startsWith("/")) {
+      filename = "/" + filename; // Garante barra inicial
+    }
+    if (filename.startsWith("/data_")) { // Apenas arquivos relevantes (apenas os jsons criados)
+      files.push_back(filename);
+    }
+    file.close();
+    file = root.openNextFile();
+  }
+  root.close();
+
+  // Ordena os arquivos em ordem alfabética (baseado no millis)
+  std::sort(files.begin(), files.end());
+
+  // Processa os arquivos ordenados
+  for (const auto& filename : files) {
+    File f = SPIFFS.open(filename, FILE_READ);
+    if (!f) {
+      Serial.println("Erro ao abrir " + filename + " para leitura. Pulando...");
+      continue;
+    }
+
+    String content = f.readString();
+    f.close();
+
+    Serial.println("Reenviando arquivo: " + filename);
+    if (client.publish(mqtt_queue, content.c_str())) {
+      Serial.println("Enviado com sucesso, tentando apagar arquivo...");
+      if (!SPIFFS.remove(filename)) {
+        Serial.println("Não foi possível remover o arquivo: " + filename);
+      } else {
+        Serial.println("Arquivo " + filename + " removido com sucesso.");
+      }
+    } else {
+      Serial.println("Falha ao enviar, mantendo arquivo...");
+      break; // Sai do loop para tentar novamente depois
+    }
+
+    delay(800);
+  }
+}
+
+String GetDateTime(){
+  struct tm timeinfo;
+  if (getLocalTime(&timeinfo)) {
+    char timeStr[20];
+    strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", &timeinfo);
+    return timeStr;
+  } else {
+    // Usa micros() se NTP não estiver disponível
+    return String("millis_") + String(micros());
+  }
+}
+
+bool CheckConnection(){
+  return WiFi.status() == WL_CONNECTED && client.connected();
+}
+
+void loop() {
+  // Caso estiver conectado ao MQTT (RabbitMQ) mantém a conexão estável
+  if (client.connected()) {
+    client.loop();
+  }
 
   // Adquire valores de temperatura e humidade
   float temperature = dht.readTemperature();
@@ -84,15 +239,34 @@ void loop() {
   }
 
   // Cria json para envio
-  char payload[100];
-  snprintf(payload, sizeof(payload), "{\"temperature\": %.2f, \"humidity\": %.2f}", temperature, humidity);
+  StaticJsonDocument<128> doc;
+  doc["temperature"] = temperature;
+  doc["humidity"] = humidity;
+  doc["timestamp"] = GetDateTime();
 
-  // Publica na fila
-  if (client.publish(mqtt_queue, payload)) {
-    Serial.print("Enviado: ");
-    Serial.println(payload);
+  // Serialização do json
+  char payload[100];
+  serializeJson(doc, payload, sizeof(payload));
+
+  // Verifica se perdeu a conexão com a internet ou com o RabbitMQ
+  if (!CheckConnection()) {
+    // Se perdeu a conexão, salva os dados localmente
+    Serial.println("Sem conexão. Salvando dados localmente...");
+    SaveToSPIFFS(payload);
+    Reconnect();
   } else {
-    Serial.println("Falha ao publicar mensagem no MQTT");
+    // Publica na fila
+    if (client.publish(mqtt_queue, payload)) {
+      Serial.print("Enviado: ");
+      Serial.println(payload);
+    } else {
+      // Caso houver erro na publicação, salva os dados localmente
+      Serial.println("Falha ao publicar. Salvando localmente...");
+      SaveToSPIFFS(payload);
+    }
+
+    // Após enviar com sucesso, tenta enviar os dados pendentes
+    SendSavedData();
   }
 
   delay(5000);
