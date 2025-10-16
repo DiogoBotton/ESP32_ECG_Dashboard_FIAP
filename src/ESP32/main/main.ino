@@ -20,6 +20,7 @@ const char* mqtt_queue = MQTT_QUEUE;
 // Definição do pino e tipo do DHT
 #define DHTPIN 19
 #define DHTTYPE DHT11
+#define AD8232 A0
 DHT dht(DHTPIN, DHTTYPE);
 
 // Declarando variaveis de Wifi e MQTT
@@ -232,6 +233,7 @@ void loop() {
   // Adquire valores de temperatura e humidade
   float temperature = dht.readTemperature();
   float humidity = dht.readHumidity();
+  float ad8232_sensor = analogRead();
 
   if (isnan(temperature) || isnan(humidity)) {
     Serial.print("Falha ao ler do sensor DHT 11");
@@ -243,6 +245,7 @@ void loop() {
   doc["temperature"] = temperature;
   doc["humidity"] = humidity;
   doc["timestamp"] = GetDateTime();
+  doc["ad8232"] = ad8232_sensor;
 
   // Serialização do json
   char payload[100];
