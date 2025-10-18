@@ -1,0 +1,525 @@
+[
+    {
+        "id": "60403ebdb022f672",
+        "type": "tab",
+        "label": "ECG + DHT11 Dashboard",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "c80b2cee2e1c6dc3",
+        "type": "tls-config",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "isrgrootx1.pem",
+        "servername": "",
+        "verifyservercert": true,
+        "alpnprotocol": ""
+    },
+    {
+        "id": "c3d85b36b9d0cf47",
+        "type": "mqtt-broker",
+        "name": "MQTT Broker (RabbitMQ)",
+        "broker": "rabbitmq",
+        "port": "1883",
+        "tls": "c80b2cee2e1c6dc3",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "50059cc75a146f4e",
+        "type": "ui_tab",
+        "name": "Monitor Cardíaco",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "c1434888b31b7552",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "e5470a59af3bf190",
+        "type": "ui_group",
+        "name": "Sensores",
+        "tab": "50059cc75a146f4e",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "1bf5be6708e0ba04",
+        "type": "tls-config",
+        "name": "",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "isrgrootx1.pem",
+        "servername": "",
+        "verifyservercert": true,
+        "alpnprotocol": ""
+    },
+    {
+        "id": "898fe0c75c6b705c",
+        "type": "mqtt-broker",
+        "name": "MQTT Broker (HiveMQ)",
+        "broker": "17b2666ad46d492eb37feb604e8c9764.s1.eu.hivemq.cloud:8883",
+        "port": "8883",
+        "tls": "1bf5be6708e0ba04",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "585ccc4508017a24",
+        "type": "mqtt in",
+        "z": "60403ebdb022f672",
+        "name": "MQTT DHT11 + AD8232 (HiveMQ)",
+        "topic": "dht11_ad8232",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "898fe0c75c6b705c",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 220,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e01b6ad5566d737e",
+        "type": "json",
+        "z": "60403ebdb022f672",
+        "name": "Parse JSON",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 590,
+        "y": 220,
+        "wires": [
+            [
+                "5131195fb2a720a6",
+                "e16a7c80241590b2",
+                "f4913dab4656ee4f",
+                "c1254c5df8e4a77c"
+            ]
+        ]
+    },
+    {
+        "id": "5131195fb2a720a6",
+        "type": "function",
+        "z": "60403ebdb022f672",
+        "name": "Temperatura",
+        "func": "msg.payload = msg.payload.temperature;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 160,
+        "wires": [
+            [
+                "6a8870d6547f2cd2",
+                "4cb888a635104b24"
+            ]
+        ]
+    },
+    {
+        "id": "e16a7c80241590b2",
+        "type": "function",
+        "z": "60403ebdb022f672",
+        "name": "Umidade",
+        "func": "msg.payload = msg.payload.humidity;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 850,
+        "y": 220,
+        "wires": [
+            [
+                "55f509e4b5281714",
+                "337dff5081c42db5"
+            ]
+        ]
+    },
+    {
+        "id": "f4913dab4656ee4f",
+        "type": "function",
+        "z": "60403ebdb022f672",
+        "name": "BPM",
+        "func": "msg.payload = msg.payload.bpm;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 280,
+        "wires": [
+            [
+                "726439ce7e104f2c",
+                "f34f09a713876b8e"
+            ]
+        ]
+    },
+    {
+        "id": "c1254c5df8e4a77c",
+        "type": "function",
+        "z": "60403ebdb022f672",
+        "name": "Timestamp",
+        "func": "msg.payload = msg.payload.timestamp;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 850,
+        "y": 340,
+        "wires": [
+            [
+                "8087d5b04916a786"
+            ]
+        ]
+    },
+    {
+        "id": "6a8870d6547f2cd2",
+        "type": "ui_gauge",
+        "z": "60403ebdb022f672",
+        "name": "Gauge Temperatura",
+        "group": "e5470a59af3bf190",
+        "order": 1,
+        "width": 6,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Temperatura (°C)",
+        "label": "°C",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "60",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1130,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "4cb888a635104b24",
+        "type": "ui_text",
+        "z": "60403ebdb022f672",
+        "group": "e5470a59af3bf190",
+        "order": 2,
+        "width": 6,
+        "height": 1,
+        "name": "Texto Temperatura",
+        "label": "Temperatura Atual",
+        "format": "{{msg.payload}} °C",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1140,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "55f509e4b5281714",
+        "type": "ui_gauge",
+        "z": "60403ebdb022f672",
+        "name": "Gauge Umidade",
+        "group": "e5470a59af3bf190",
+        "order": 3,
+        "width": 6,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Umidade (%)",
+        "label": "%",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1120,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "337dff5081c42db5",
+        "type": "ui_text",
+        "z": "60403ebdb022f672",
+        "group": "e5470a59af3bf190",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "name": "Texto Umidade",
+        "label": "Umidade Atual",
+        "format": "{{msg.payload}} %",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1130,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "726439ce7e104f2c",
+        "type": "ui_gauge",
+        "z": "60403ebdb022f672",
+        "name": "Gauge BPM",
+        "group": "e5470a59af3bf190",
+        "order": 5,
+        "width": 6,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Batimentos (BPM)",
+        "label": "bpm",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "200",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 1130,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "f34f09a713876b8e",
+        "type": "ui_chart",
+        "z": "60403ebdb022f672",
+        "name": "Gráfico BPM",
+        "group": "e5470a59af3bf190",
+        "order": 6,
+        "width": 12,
+        "height": 4,
+        "label": "Histórico de BPM",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "Aguardando dados...",
+        "dot": false,
+        "ymin": "0",
+        "ymax": "200",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#ff0000"
+        ],
+        "outputs": 1,
+        "x": 1130,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8087d5b04916a786",
+        "type": "ui_text",
+        "z": "60403ebdb022f672",
+        "group": "e5470a59af3bf190",
+        "order": 7,
+        "width": 12,
+        "height": 1,
+        "name": "Texto Timestamp",
+        "label": "Última Atualização",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1140,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "bca17a5912d38b5b",
+        "type": "mqtt in",
+        "z": "60403ebdb022f672",
+        "name": "MQTT DHT11 + AD8232 (RabbitMQ)",
+        "topic": "dht11_ad8232",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "c3d85b36b9d0cf47",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 220,
+        "y": 360,
+        "wires": [
+            [
+                "e01b6ad5566d737e"
+            ]
+        ]
+    },
+    {
+        "id": "fdcf29f191bbccc3",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.6"
+        }
+    }
+]

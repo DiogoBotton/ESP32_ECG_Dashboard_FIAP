@@ -1,0 +1,38 @@
+{
+  "vhosts": [{ "name": "/" }],
+  "users": [
+    {
+      "name": "guest",
+      "password": "guest",
+      "tags": "administrator"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "queues": [
+    {
+      "name": "dht11_ad8232",
+      "vhost": "/",
+      "durable": false,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "amq.topic",
+      "vhost": "/",
+      "destination": "dht11_ad8232",
+      "destination_type": "queue",
+      "routing_key": "dht11_ad8232",
+      "arguments": {}
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 #include <time.h>
 #include <DHT.h>
 #include <PubSubClient.h>
+#include <WiFiClientSecure.h>
 #include <WiFi.h>
 #include "FS.h"
 #include "SPIFFS.h"
@@ -17,14 +18,19 @@ const char* mqtt_user = MQTT_USER;
 const char* mqtt_pwd = MQTT_PWD;
 const char* mqtt_queue = MQTT_QUEUE;
 
+// Definição dos pinos do AD8232
+#define ECG_PIN 36       // Pino de saída analógica do AD8232 (OUTPUT)
+#define LO_PLUS_PIN 25   // Lead-off positivo (LO+)
+#define LO_MINUS_PIN 26  // Lead-off negativo (LO-)
+
 // Definição do pino e tipo do DHT
 #define DHTPIN 19
 #define DHTTYPE DHT11
-#define AD8232 A0
 DHT dht(DHTPIN, DHTTYPE);
 
 // Declarando variaveis de Wifi e MQTT
-WiFiClient espClient;
+//WiFiClientSecure espClient; // Conexão para o HiveMQ (necessário para conexão TLS via ESP32)
+WiFiClient espClient; // Conexão para o RabbitMQ
 PubSubClient client(espClient);
 
 // Funções com paramêtros precisam ser declaradas antes de serem utilizadas
@@ -53,6 +59,12 @@ void setup() {
     delay(3000);
     ESP.restart();
   }
+
+  pinMode(LO_PLUS_PIN, INPUT);
+  pinMode(LO_MINUS_PIN, INPUT);
+  pinMode(ECG_PIN, INPUT);
+
+  //espClient.setInsecure(); // Necessário desabilitar o certificado para enviar os dados ao HiveMQ
 
   dht.begin();
   delay(2000);
@@ -224,6 +236,35 @@ bool CheckConnection(){
   return WiFi.status() == WL_CONNECTED && client.connected();
 }
 
+float calculateBPM(int ecgValue) {
+  const int threshold = 2000;  // limite de detecção
+  const unsigned long debounceTime = 250;  // tempo mínimo entre batimentos (ms) (~240 BPM)
+  
+  static unsigned long lastBeatTime = 0;
+  static bool aboveThreshold = false;
+  static float bpm = 0;
+
+  unsigned long now = millis();
+
+  // --- Detecta subida acima do limiar ---
+  if (ecgValue > threshold && !aboveThreshold) {
+    aboveThreshold = true;
+    if (lastBeatTime > 0) {
+      unsigned long delta = now - lastBeatTime;
+      if (delta > debounceTime) {
+        bpm = 60000.0 / delta;  // converte intervalo (ms) em batimentos/minuto
+      }
+    }
+    lastBeatTime = now;
+  }
+
+  if (ecgValue < threshold) {
+    aboveThreshold = false;
+  }
+
+  return bpm;
+}
+
 void loop() {
   // Caso estiver conectado ao MQTT (RabbitMQ) mantém a conexão estável
   if (client.connected()) {
@@ -233,7 +274,8 @@ void loop() {
   // Adquire valores de temperatura e humidade
   float temperature = dht.readTemperature();
   float humidity = dht.readHumidity();
-  float ad8232_sensor = analogRead();
+  float ecg_value = analogRead(ECG_PIN);
+  float bpm = calculateBPM(ecg_value);
 
   if (isnan(temperature) || isnan(humidity)) {
     Serial.print("Falha ao ler do sensor DHT 11");
@@ -245,7 +287,7 @@ void loop() {
   doc["temperature"] = temperature;
   doc["humidity"] = humidity;
   doc["timestamp"] = GetDateTime();
-  doc["ad8232"] = ad8232_sensor;
+  doc["bpm"] = bpm;
 
   // Serialização do json
   char payload[100];
@@ -272,5 +314,5 @@ void loop() {
     SendSavedData();
   }
 
-  delay(5000);
+  delay(100);
 }

@@ -1,0 +1,45 @@
+services:
+  rabbitmq:
+    image: rabbitmq:4.0-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+      - "1883:1883"
+    volumes:
+      - ./definitions.json:/etc/rabbitmq/definitions.json
+    environment:
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbitmq_management load_definitions "/etc/rabbitmq/definitions.json"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "5672"]
+      interval: 5s
+      timeout: 15s
+      retries: 5
+    command: >
+      sh -c "rabbitmq-plugins enable rabbitmq_mqtt && rabbitmq-plugins enable rabbitmq_management && rabbitmq-server"
+    networks:
+      - cardio-network
+
+  nodered:
+    build:
+      context: .
+      dockerfile: Dockerfile.nodered
+    container_name: cardio-nodered
+    restart: unless-stopped
+    ports:
+      - "1880:1880"
+    volumes:
+      - nodered_data:/data
+    environment:
+      - TZ=America/Sao_Paulo
+    depends_on:
+      - rabbitmq
+    networks:
+      - cardio-network
+
+volumes:
+  nodered_data:
+    driver: local
+
+networks:
+  cardio-network:
+    driver: bridge
