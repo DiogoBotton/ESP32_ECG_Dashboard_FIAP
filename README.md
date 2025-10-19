@@ -32,6 +32,10 @@ Sistema para monitoramento de temperatura, umidade e batimentos cardíacos.
 
 Este projeto tem como objetivo utilizar um sensor DHT11 para capturar informações de temperatura e humidade e outro sensor de ECG (eletrocardiograma) AD8232 para capturar informações de batimentos cardíacos e enviar para um Broker MQTT (RabbitMQ) para ser exibido em um dashboard, que por sua vez, foi desenvolvido com node-RED.
 
+**Modelo do ESP32 utilizado:** ESP-WROOM-32
+
+![esp32wroom](assets/esp32wroom.png)
+
 **Dentro da pasta src há um readme do projeto com mais detalhes**.
 
 ## 📁 Estrutura de pastas
@@ -42,11 +46,9 @@ Dentre os arquivos e pastas presentes na raiz do projeto, definem-se:
 
 - <b>scripts</b>: Aqui estão os arquivos de implementação (deploy) com docker-compose.
 
-- <b>src/ESP32</b>: Código fonte da solução de IOT e visualização com node-RED.
+- <b>src/ESP32/main</b>: Código fonte da solução de IOT.
 
-## 🔧 Como executar o código
-
-A fazer...
+- <b>src/ESP32/nodered_flow</b>: Export do fluxo de dashboard do node-RED.
 
 ## 📋 Licença
 
