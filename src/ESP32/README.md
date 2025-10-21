@@ -17,12 +17,15 @@
 ### Diagramas e foto do projeto com ESP32 físico
 
 **Diagrama AD8232**
+
 ![ad8232](readme-imgs/ad8232.png)
 
 **Diagrama DHT11**
+
 ![dht11](readme-imgs/dht11.png)
 
 **Projeto final**
+
 ![ESP32 fisico](readme-imgs/esp32.jpg)
 
 **Vídeo do funcionamento do projeto**
