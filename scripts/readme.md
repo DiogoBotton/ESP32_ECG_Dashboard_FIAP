@@ -1,7 +1,7 @@
 ## Scripts
 
-Para rodar o docker-compose com o RabbitMQ digite:
+Para rodar o docker-compose com o RabbitMQ e node-RED digite:
 
 ```bash
-    docker-compose -f docker-compose-rabbitmq.yml up -d --build
+    docker-compose up -d --build
 ```
