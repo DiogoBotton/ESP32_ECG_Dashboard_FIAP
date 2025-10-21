@@ -182,7 +182,7 @@ Envio de dados para RabbitMQ ou HiveMQ;
 
 Leitura dos valores no Node-RED em tempo real.
 
-⚠️ Observações sobre o ECG
+#### ⚠️ Observações sobre o ECG
 
 O sensor AD8232 apresentou ruídos significativos, dificultando a captura precisa dos batimentos cardíacos;
 
@@ -194,9 +194,9 @@ Mesmo assim, os dados foram enviados com sucesso, comprovando que o fluxo comple
 
 A segunda parte do projeto demonstrou:
 
-✔ Integração entre ESP32 e brokers MQTT (RabbitMQ local e HiveMQ na nuvem);
-✔ Consumo e exibição dos dados em tempo real via Node-RED Dashboard;
-✔ Implementação de gauges, gráfico histórico e timestamp de transmissão;
-✔ Teste prático com sensores reais.
+- Integração entre ESP32 e brokers MQTT (RabbitMQ local e HiveMQ na nuvem);
+- Consumo e exibição dos dados em tempo real via Node-RED Dashboard;
+- Implementação de gauges, gráfico histórico e timestamp de transmissão;
+- Teste prático com sensores reais.
 
 Mesmo com ruídos no sensor de ECG, o sistema comprovou a viabilidade da solução e a eficácia da comunicação IoT utilizando MQTT.
